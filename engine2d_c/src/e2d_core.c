@@ -17,6 +17,10 @@ float LimitNum(float number, float limit) {
 	return numberMag * vorzeichen;
 }
 
+void DrawArrow(Vector2 v_base, Vector2 v_target, Color c) {
+	DrawLineEx(v_base, v_target, 4, c);
+}
+
 Matrix3x1 VecToMatrix(Vector2 point) {
 
 	return (Matrix3x1){{point.x, point.y, 1}};
@@ -70,54 +74,87 @@ Matrix3x1 RotateMatrix(Vector2 point, Vector2 center, float angel) {
 
 
 
-Vector2 CreateVec(float x, float y) {
+Vector2 vecCreate(float x, float y) {
     return (Vector2){x, y};
 }
 
-void SetVec(Vector2* v, float x, float y) {
+void vSet(Vector2* v, float x, float y) {
 	v->x = x;
 	v->y = y;
 }
 
-Vector2 ScaleVec(Vector2 v, float n) {
-	Vector2 result = {v.x*n, v.y*n};
-	return result;
-
+void vScale(Vector2* v, float n) {
+	v->x = v->x * n;
+	v->y = v->y * n;
 }
 
-Vector2 DivVec(Vector2 v, float n) {
-	Vector2 result = {v.x/n, v.y/n};
-	return result;
+void vDiv(Vector2* v, float n) {
+	v->x = v->x / n;
+	v->y = v->y / n;	
 }
 
-Vector2 AddVec(Vector2 v1, Vector2 v2) {
+Vector2 vecAdd(Vector2 v1, Vector2 v2) {
 	Vector2 result = {v1.x + v2.x, v1.y + v2.y};
 	return result;
 }
 
-Vector2 SubVec(Vector2 v1, Vector2 v2) {
+Vector2 VecSub(Vector2 v1, Vector2 v2) {
 	Vector2 result = {v1.x - v2.x, v1.y - v2.y};
 	return result;
 }
 
-Vector2 NormVec(Vector2 v) {
-	Vector2 result = {0.0f, 0.0f};
-	float len = sqrtf(v.x * v.x + v.y * v.y);
+void vNorm(Vector2* v) {
+	float len = sqrtf(v->x * v->x + v->y * v->y);
 	if (len > 0) {
-		result.x = v.x / len;
-		result.y = v.y / len;
+		v->x = v->x / len;
+		v->y = v->y / len;
 	}
-	return result;
 }
 
-float DotVec(Vector2 v1, Vector2 v2) {
+void vLimit(Vector2* v, float max) {
+	float len = sqrtf(v->x * v->x + v->y * v->y);
+	if (len > max) {
+		v->x = v->x / len * max;
+		v->y = v->y / len * max;
+	}
+}
+
+void vSetMag(Vector2* v, float magnitude) {
+	float len = sqrtf(v->x * v->x + v->y * v->y);
+	if (len > 0) {
+		v->x = v->x / len * magnitude;
+		v->y = v->y / len * magnitude;
+	}
+}
+
+float vecDot(Vector2 v1, Vector2 v2) {
 	return v1.x * v2.x + v1.y * v2.y;
 }
 
-float MagVec(Vector2 v) {
+float vecCross(Vector2 v1, Vector2 v2) {
+	return v1.x * v2.y - v1.y * v2.x;
+}
+
+Vector2 vecPerp(Vector2 v) {
+	return (Vector2){-v.y, v.x};
+}
+
+float vecMag(Vector2 v) {
 	return sqrtf(v.x * v.x + v.y * v.y);
 }
 
-float MagsqVec(Vector2 v) {
+float vecMagsq(Vector2 v) {
 	return v.x * v.x + v.y * v.y;
+}
+
+float vecDist(Vector2 v1, Vector2 v2) {
+	Vector2 vdist = VecSub(v1, v2);
+	return vecMag(vdist);
+}
+
+Vector2 vecRotate(Vector2 v, Vector2 base, float n) {
+	Vector2 direction = VecSub(v, base);
+	float x = direction.x * cosf(n) - direction.y * sinf(n);
+	float y = direction.x * sinf(n) + direction.y * cosf(n);
+	return (Vector2){x = x + base.x, y = y + base.y};
 }

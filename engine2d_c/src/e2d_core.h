@@ -17,40 +17,32 @@ typedef struct {
 
 int Random(int range_start, int range_end);
 float LimitNum(float number, float limit);
+void DrawArrow(Vector2 v_base, Vector2 v_target, Color c);
+
 Matrix3x1 VecToMatrix(Vector2 point);
 Vector2 MatrixToVec(Matrix3x1 matrix);
 Matrix3x1 MultMatrix(Matrix3x3 a, Matrix3x1 b);
 Matrix3x1 RotateMatrix(Vector2 point, Vector2 center, float angel);
 
-Vector2 createVec(float x, float y);
-Vector2 copyVec(Vector2 v);
-void setV(Vector2* v, float x, float y);
-void multV(Vector2* v, float n);
-void divV(Vector2* v, float n);
-void addV(Vector2* v, Vector2 v_add);
-void subV(Vector2* v, Vector2 v_sub);
-void normalizeV(Vector2* v);
-void limitV(Vector2* v, float max);
-void setmagV(Vector2* v, float magnitude);
-void rotateV(Vector2* base, float n);
+Vector2 vecCreate(float x, float y);
+void vSet(Vector2* v, float x, float y);
+void vScale(Vector2* v, float n);
+void vDiv(Vector2* v, float n);
+Vector2 vecAdd(Vector2 v, Vector2 v_add);
+Vector2 VecSub(Vector2 v, Vector2 v_sub);
+void vNorm(Vector2* v);
+void vLimit(Vector2* v, float max);
+void vSetMag(Vector2* v, float magnitude);
+float vecDot(Vector2 v1, Vector2 v2);
+float vecCross(Vector2 v1, Vector2 v2);
+Vector2 vecPerp(Vector2 v);
+float vecMag(Vector2 v);
+float vecMagsq(Vector2 v);
+float vecDist(Vector2 v1, Vector2 v2);
+Vector2 vecRotate(Vector2 v, Vector2 base, float n);
 
-float dotV(Vector2 v1, Vector2 v2);
-float magV(Vector2 v);
-float magsqV(Vector2 v);
 /*
 
-
-float cross(Vec2d v);
-float mag();
-
-float distance(Vec2d v);
-
-Vector2 perp();
-Vector2 addVec(Vec2d v1, Vec2d v2);
-Vector2 subVec(Vec2d v1, Vec2d v2);
-Vector2 multVec(Vec2d v, float n);
-Vector2 divVec(Vec2d v, float n);
-void DrawArrow(Vec2d v_base, Vec2d v_target, Color c);
 */
 
 #endif
