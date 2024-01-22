@@ -47,5 +47,7 @@ float e2Distance(Vector2 v1, Vector2 v2);
 Vector2 e2Rotate(Vector2 v, Vector2 base, float n);
 
 Intersection e2Intersect(Vector2 start_a, Vector2 end_a, Vector2 start_b, Vector2 end_b);
+float e2MinDist(Vector2 p, Vector2 start_a, Vector2 end_a);
+
 
 #endif

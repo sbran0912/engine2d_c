@@ -109,7 +109,7 @@ Vector2 e2Sub(Vector2 v1, Vector2 v2) {
 
 void e2NormalizeV(Vector2* v) {
 	float len = sqrtf(v->x * v->x + v->y * v->y);
-	if (len > 0) {
+	if (len > 0.0001) {
 		v->x = v->x / len;
 		v->y = v->y / len;
 	}
@@ -153,7 +153,7 @@ float e2Magsq(Vector2 v) {
 
 float e2Distance(Vector2 v1, Vector2 v2) {
 	Vector2 vdist = e2Sub(v1, v2);
-	return vecMag(vdist);
+	return e2Mag(vdist);
 }
 
 Vector2 e2Rotate(Vector2 v, Vector2 base, float n) {
@@ -171,9 +171,31 @@ Intersection e2Intersect(Vector2 start_a, Vector2 end_a, Vector2 start_b, Vector
 	if (fabs(cross1 - 0.0f) > 0.01) { //Float kann man nicht direkt auf 0 testen!!!
 		float s = e2Cross(e2Sub(start_b, start_a), b) / cross1;
 		float u = e2Cross(e2Sub(start_a, start_b), a) / cross2;
-		if (s > 0 && s < 1 && u > 0 && u < 1) {
+		if (s > 0.0001 && s < 1 && u > 0.0001 && u < 1) {
 			return (Intersection){s, e2Add(start_a, e2Scale(a, s))};
 		}
 	}
 	return (Intersection){0.0f, (Vector2){0.0f, 0.0f}};
+}
+
+float e2MinDist(Vector2 p, Vector2 start_a, Vector2 end_a) {
+	float dist = -1.0f;
+
+	//Vektor start_a to end_a (line_a)
+	Vector2 line_a = e2Sub(end_a, start_a);
+	//Vektor imaginary line start_a to p
+	Vector2 start_a_to_p = e2Sub(p, start_a);
+	//Magnitude of line_a
+	float magnitude = e2Mag(line_a);
+
+	//Scalarprojecton from line (start_a to p) on line_a
+	e2NormalizeV(&line_a);
+	float sp = e2Dot(line_a, start_a_to_p);
+
+	//Scalarprojection in magnitude of line_a?
+	if (sp > 0.0001 && sp <= magnitude) {
+		e2ScaleV(&line_a, sp);
+		dist = e2Mag(e2Sub(start_a_to_p, line_a));
+	}
+	return dist;
 }
