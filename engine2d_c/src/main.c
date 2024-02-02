@@ -3,7 +3,7 @@
 int main() {
 
     struct _shape box = createBox(50, 50, 150, 150);
-    ApplyForce(&box, (Vector2){300.0f, 0.0f}, 10.0f);
+    //ApplyForce(&box, (Vector2){300.0f, 0.0f}, 10.0f);
 
 
 
@@ -24,6 +24,10 @@ int main() {
         ClearBackground(RAYWHITE);
         Draw(&box, 3, RED);
         Update(&box);
+        Vector2 kick = checkKicking(&box);
+        if (kick.x != 0) {
+            printf("Force = %f %f \n", kick.x, kick.y);    
+        }
 
     	EndDrawing();
     }
