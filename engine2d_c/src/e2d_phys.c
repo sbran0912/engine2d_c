@@ -120,20 +120,20 @@ Shape createBall(float x, float y, float r) {
     return result;
 }
 
-void Draw(Shape *shape, float thick, Color c) {
+void draw(Shape *shape, float thick, Color c) {
     shape->funcDraw(shape, thick, c);
 }
 
-void Update(Shape *shape) {
+void update(Shape *shape) {
     shape->funcUpdate(shape);
 }
 
-void ApplyForce(Shape *shape, Vector2 force, float angForce) {
+void applyForce(Shape *shape, Vector2 force, float angForce) {
     shape->accel = addVec(shape->accel, divVec(force, shape->mass));
     shape->angAccel += angForce / shape->mass;
 }
 
-void ResetPos(Shape *shape, Vector2 v) {
+void resetPos(Shape *shape, Vector2 v) {
     shape->funcResetPos(shape, v);
 }
 
@@ -159,3 +159,42 @@ Vector2 checkKicking(Shape* shape) {
 
     return (Vector2){0, 0};
 }
+
+CollisionPoint detectCollisionBox(Shape boxA, Shape boxB) {
+    // Geprüft wird, ob eine Ecke von boxA in die Kante von boxB schneidet
+    // Zusätzlich muss die Linie von Mittelpunkt boxA und Mittelpunkt boxB durch Kante von boxB gehen
+    // i ist Index von Ecke und j ist Index von Kante
+    // d = Diagonale von A.Mittelpunkt zu A.vertices(i)
+    // e = Kante von B(j) zu B(j+1)
+    // z = Linie von A.Mittelpunkt zu B.Mittelpunkt
+    // _perp = Perpendicularvektor
+    // scalar_d Faktor von d für den Schnittpunkt d/e
+    // scalar_z Faktor von z für den Schnittpunkt z/e
+    // mtv = minimal translation vector (überlappender Teil von d zur Kante e)
+
+    for (int i = 0; i < 4; i++) {            
+        for (int j = 0; j < 4; j++) {
+            // Prüfung auf intersection von Diagonale d zu Kante e
+            Intersection isd = intersect(boxA.location, boxA.vertices[i], boxB.vertices[j], boxB.vertices[j + 1]);   
+            if (isd.distance > 0.0f) {
+                // Prüfung auf intersection Linie z zu Kante e
+                Intersection isz = intersect(boxA.location, boxB.location, boxB.vertices[j], boxB.vertices[j + 1]);
+                if (isz.distance > 0.0f) {
+                    // Collision findet statt
+                    // Objekte zurücksetzen und normal_e berechnen. Kollisionspunkt ist Ecke i von BoxA
+                    Vector2 e = subVec(boxB.vertices[j + 1], boxB.vertices[j]);
+                    Vector2 e_perp = {-(e.y), e.x};
+                    Vector2 d = subVec(boxA.vertices[i], boxA.location);  
+                    vecScale(&d, 1-isd.distance);
+                    vecNormalize(&e_perp);
+                    float distance = dot(e_perp, d);
+                    vecScale(&e_perp, -distance); //mtv
+                    resetPos(&boxA, scaleVec(e_perp, 0.5f));
+                    resetPos(&boxB, scaleVec(e_perp, -0.5f));
+                    vecNormalize(&e_perp); // normal_e
+                    return (CollisionPoint){boxA.vertices[i], e_perp};                }
+            }
+        }
+    }
+    return (CollisionPoint) {{0.0f, 0.0f}, {0.0f, 0.0f}};
+};

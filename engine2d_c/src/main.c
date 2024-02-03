@@ -22,8 +22,8 @@ int main() {
         BeginDrawing();
 
         ClearBackground(RAYWHITE);
-        Draw(&box, 3, RED);
-        Update(&box);
+        draw(&box, 3, RED);
+        update(&box);
         Vector2 kick = checkKicking(&box);
         if (kick.x != 0) {
             printf("Force = %f %f \n", kick.x, kick.y);    

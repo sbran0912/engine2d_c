@@ -4,6 +4,11 @@
 
 enum figure {BOX, BALL};
 
+typedef struct {
+    Vector2 cp;
+    Vector2 normal;
+} CollisionPoint;
+
 typedef struct _shape {
     enum figure typ;
     Vector2 location;
@@ -25,10 +30,14 @@ typedef struct _shape {
 Shape createBox(float x, float y, float w, float h);
 Shape createBall(float x, float y, float r);
 
-void Draw(Shape* shape, float thick, Color c);
-void Update(Shape* shape);
-void ApplyForce(Shape* shape, Vector2 force, float angForce);
-void ResetPos(Shape* shape, Vector2 v);
+void draw(Shape* shape, float thick, Color c);
+void update(Shape* shape);
+void applyForce(Shape* shape, Vector2 force, float angForce);
+void resetPos(Shape* shape, Vector2 v);
 Vector2 checkKicking(Shape* shape);
+
+CollisionPoint detectCollisionBox(Shape boxA, Shape boxB);
+CollisionPoint detectCollisionBall(Shape ballA, Shape ballB);
+CollisionPoint detectCollisionBallBox(Shape ball, Shape box);
 
 #endif
