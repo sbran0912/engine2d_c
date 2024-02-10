@@ -160,7 +160,7 @@ Vector2 checkKicking(Shape* shape) {
     return (Vector2){0, 0};
 }
 
-CollisionPoint detectCollisionBox(Shape boxA, Shape boxB) {
+CollisionPoint detectCollisionBox(Shape* boxA, Shape* boxB) {
     // Geprüft wird, ob eine Ecke von boxA in die Kante von boxB schneidet
     // Zusätzlich muss die Linie von Mittelpunkt boxA und Mittelpunkt boxB durch Kante von boxB gehen
     // i ist Index von Ecke und j ist Index von Kante
@@ -175,26 +175,82 @@ CollisionPoint detectCollisionBox(Shape boxA, Shape boxB) {
     for (int i = 0; i < 4; i++) {            
         for (int j = 0; j < 4; j++) {
             // Prüfung auf intersection von Diagonale d zu Kante e
-            Intersection isd = intersect(boxA.location, boxA.vertices[i], boxB.vertices[j], boxB.vertices[j + 1]);   
+            Intersection isd = intersect(boxA->location, boxA->vertices[i], boxB->vertices[j], boxB->vertices[j + 1]);   
             if (isd.distance > 0.0f) {
                 // Prüfung auf intersection Linie z zu Kante e
-                Intersection isz = intersect(boxA.location, boxB.location, boxB.vertices[j], boxB.vertices[j + 1]);
+                Intersection isz = intersect(boxA->location, boxB->location, boxB->vertices[j], boxB->vertices[j + 1]);
                 if (isz.distance > 0.0f) {
                     // Collision findet statt
                     // Objekte zurücksetzen und normal_e berechnen. Kollisionspunkt ist Ecke i von BoxA
-                    Vector2 e = subVec(boxB.vertices[j + 1], boxB.vertices[j]);
+                    Vector2 e = subVec(boxB->vertices[j + 1], boxB->vertices[j]);
                     Vector2 e_perp = {-(e.y), e.x};
-                    Vector2 d = subVec(boxA.vertices[i], boxA.location);  
+                    Vector2 d = subVec(boxA->vertices[i], boxA->location);  
                     vecScale(&d, 1-isd.distance);
                     vecNormalize(&e_perp);
                     float distance = dot(e_perp, d);
                     vecScale(&e_perp, -distance); //mtv
-                    resetPos(&boxA, scaleVec(e_perp, 0.5f));
-                    resetPos(&boxB, scaleVec(e_perp, -0.5f));
+                    resetPos(boxA, scaleVec(e_perp, 0.5f));
+                    resetPos(boxB, scaleVec(e_perp, -0.5f));
                     vecNormalize(&e_perp); // normal_e
-                    return (CollisionPoint){boxA.vertices[i], e_perp};                }
+                    return (CollisionPoint){boxA->vertices[i], e_perp};                }
             }
         }
     }
     return (CollisionPoint) {{0.0f, 0.0f}, {0.0f, 0.0f}};
 };
+
+CollisionPoint detectCollisionBall(Shape* ballA, Shape* ballB) {
+    //Distanz ermitteln
+    float radiusTotal = ballA->radius + ballB->radius;
+    float dist = distance(ballA->location, ballB->location);
+    if (dist < radiusTotal) {
+        //Treffer
+        float space = (radiusTotal - dist);
+        Vector2 collisionLine = subVec(ballA->location, ballB->location);
+        vecSetMag(&collisionLine, space);
+        resetPos(ballA, scaleVec( collisionLine, 0.5));
+        resetPos(ballB, scaleVec( collisionLine, -0.5));
+        vecNormalize(&collisionLine);
+        return (CollisionPoint) {{0.0f, 0.0f}, collisionLine};
+    }
+    return (CollisionPoint) {{0.0f, 0.0f}, {0.0f, 0.0f}};
+}
+
+CollisionPoint detectCollisionBallBox(Shape* ball, Shape* box) {
+    for (int i = 0; i < 4; i++) {
+        //Kante der Box
+        Vector2 e = subVec(box->vertices[i+1], box->vertices[i]);
+        //Vektor von Ecke der Box zum Ball
+        Vector2 VerticeToBall = subVec(ball->location, box->vertices[i]);
+        //Kollision mit Ecken abfangen
+        if (mag(VerticeToBall) < ball->radius) {
+            return (CollisionPoint){box->vertices[i], VerticeToBall};
+        }
+        float mag_e = mag(e);
+        vecNormalize(&e);
+        //Scalarprojektion von Vektor VerticeToBall auf Kante e
+        float scalar_e = dot(VerticeToBall, e);
+        if (scalar_e > 0 && scalar_e <= mag_e) {
+            //Senkrechte von Ball trifft auf Kante e der Box
+            //e2 = Kante e mit der Länge von scalar_e
+            Vector2 e2 = scaleVec(e, scalar_e);
+            //Senkrechte von e zum Ball = VerticeToBall - e2
+            Vector2 e_perp = subVec(VerticeToBall, e2);
+
+            if (mag(e_perp) < ball->radius) {
+                //Ball berührt Box
+                //Abstand wieder herstellen mit mtv (minimal translation vector)
+                Vector2 mtv = e_perp;
+                Vector2 p = addVec(box->vertices[i], e2);
+                vecSetMag(&mtv, ball->radius - mag(e_perp));
+                //e_perp und damit mtv zeigt von Kante zu Ball
+                resetPos(ball, mtv);
+                //vor Berechnung muss e_perp normalisiert werden
+                vecNormalize(&e_perp);
+                //resolveCollisionBallBox(ball, box, p, e_perp)
+                return (CollisionPoint){p, e_perp};
+            }
+        }
+    }
+    return (CollisionPoint) {{0.0f, 0.0f}, {0.0f, 0.0f}};
+}

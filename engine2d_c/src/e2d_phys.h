@@ -36,8 +36,8 @@ void applyForce(Shape* shape, Vector2 force, float angForce);
 void resetPos(Shape* shape, Vector2 v);
 Vector2 checkKicking(Shape* shape);
 
-CollisionPoint detectCollisionBox(Shape boxA, Shape boxB);
-CollisionPoint detectCollisionBall(Shape ballA, Shape ballB);
-CollisionPoint detectCollisionBallBox(Shape ball, Shape box);
+CollisionPoint detectCollisionBox(Shape* boxA, Shape* boxB);
+CollisionPoint detectCollisionBall(Shape* ballA, Shape* ballB);
+CollisionPoint detectCollisionBallBox(Shape* ball, Shape* box);
 
 #endif
