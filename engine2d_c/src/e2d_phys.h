@@ -39,5 +39,6 @@ Vector2 checkKicking(Shape* shape);
 CollisionPoint detectCollisionBox(Shape* boxA, Shape* boxB);
 CollisionPoint detectCollisionBall(Shape* ballA, Shape* ballB);
 CollisionPoint detectCollisionBallBox(Shape* ball, Shape* box);
+void resolveCollisionBox(Shape* boxA, Shape* boxB, Vector2 cp, Vector2 normal);
 
 #endif

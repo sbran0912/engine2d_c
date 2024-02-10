@@ -254,3 +254,43 @@ CollisionPoint detectCollisionBallBox(Shape* ball, Shape* box) {
     }
     return (CollisionPoint) {{0.0f, 0.0f}, {0.0f, 0.0f}};
 }
+
+void resolveCollisionBox(Shape* boxA, Shape* boxB, Vector2 cp, Vector2 normal) {
+    // rAP = Linie von A.location zu Kollisionspunkt (Ecke i von BoxA)
+    Vector2 rAP = subVec(cp, boxA->location);
+    // rBP = Linie von B.location zu Kollisionspunkt (ebenfalls Ecke i von BoxA)
+    Vector2 rBP = subVec(cp, boxB->location);
+    Vector2 rAP_perp = {-rAP.y, rAP.x};
+    Vector2 rBP_perp = {-rBP.y, rBP.x};
+    Vector2 VtanA = scaleVec(rAP_perp, boxA->angVelocity);
+    Vector2 VtanB = scaleVec(rBP_perp, boxB->angVelocity);
+    Vector2 VgesamtA = addVec(boxA->velocity, VtanA);
+    Vector2 VgesamtB = addVec(boxB->velocity, VtanB);
+    Vector2 velocity_AB = subVec(VgesamtA, VgesamtB);
+    if (dot(velocity_AB, normal) < 0) { // wenn negativ, dann auf Kollisionskurs
+        float e = 1.0f; //inelastischer Stoß
+        float j_denominator = dot(scaleVec(velocity_AB, -(1+e)), normal);
+        float j_divLinear = dot(normal, scaleVec(normal, (1/boxA->mass + 1/boxB->mass)));
+        float j_divAngular = (float)pow(dot(rAP_perp, normal), 2) / boxA->inertia + (float)pow(dot(rBP_perp, normal), 2) / boxB->inertia;
+        float j = j_denominator / (j_divLinear + j_divAngular);
+        // Grundlage für Friction berechnen (t)
+        Vector2 t = {-(normal.y), normal.x};
+        float t_scalarprodukt = dot(velocity_AB, t);
+        vecScale(&t, (t_scalarprodukt));
+        vecNormalize(&t);
+        
+        //apply Force to acceleration
+        //boxA.accel.add(lb2d.addVector(lb2d.multVector(normal, (j/boxA.mass)), lb2d.multVector(t, (0.2*-j/boxA.mass))));
+        //boxA.angAccel += lb2d.dotProduct(rAP_perp, lb2d.addVector(lb2d.multVector(normal, j/boxA.inertia), lb2d.multVector(t, 0.2*-j/boxA.inertia)));
+        //boxB.accel.add(lb2d.addVector(lb2d.multVector(normal, (-j/boxB.mass)), lb2d.multVector(t, (0.2*j/boxB.mass))));
+        //boxB.angAccel += lb2d.dotProduct(rBP_perp, lb2d.addVector(lb2d.multVector(normal, -j/boxB.inertia), lb2d.multVector(t, 0.2*j/boxB.inertia)));
+        
+        Vector2 force = addVec(scaleVec(normal, (j/boxA->mass)), scaleVec(t, (0.2*-j/boxA->mass)));
+        float force_ang = dot(rAP_perp, addVec(scaleVec(normal, j/boxA->inertia), scaleVec(t, 0.2*-j/boxA->inertia)));
+        applyForce(boxA, force, force_ang);
+
+        Vector2 force = addVec(scaleVec(normal, (-j/boxB->mass)), scaleVec(t, (0.2*j/boxB->mass)));
+        float force_ang = dot(rAP_perp, addVec(scaleVec(normal, -j/boxB->inertia), scaleVec(t, 0.2*j/boxB->inertia)));
+        applyForce(boxB, force, force_ang);
+
+}
