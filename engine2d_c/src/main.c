@@ -1,12 +1,12 @@
 #include "e2d_phys.h"
+#define MAX 4
 
 int main() {
-
-    struct _shape box = createBox(50, 50, 150, 150);
-    //ApplyForce(&box, (Vector2){300.0f, 0.0f}, 10.0f);
-
-
-
+    Shape shapes[MAX];
+    shapes[0] = createBox(150, 150, 150, 150);
+    shapes[1] = createBox(160, 400, 150, 150);
+    shapes[2] = createBall(700, 150, 40);
+    shapes[3] = createBall(800, 400, 40);
 
     // Initialization
     //--------------------------------------------------------------------------------------
@@ -17,23 +17,23 @@ int main() {
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
 
     // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
-    {
+    while (!WindowShouldClose()) {
         BeginDrawing();
-
         ClearBackground(RAYWHITE);
-        draw(&box, 3, RED);
-        update(&box);
-        Vector2 kick = checkKicking(&box);
-        if (kick.x != 0) {
-            printf("Force = %f %f \n", kick.x, kick.y);    
+        for (size_t i = 0; i < MAX; i++) {
+            for (size_t j = i + 1; j < MAX; j++) {
+                checkCollision(&shapes[i], &shapes[j]);
+            }
+            Vector2 force = checkKicking(&shapes[i]);
+            applyForce(&shapes[i], force, 0);
+            update(&shapes[i]);
+            draw(&shapes[i], 3, RED);
         }
-
+        //printf("%f\n", shapes[0].velocity.y);
     	EndDrawing();
     }
 
-    // De-Initialization
-    CloseWindow();                  // Close window and OpenGL context
+    CloseWindow();   
 	return 0;
 
 

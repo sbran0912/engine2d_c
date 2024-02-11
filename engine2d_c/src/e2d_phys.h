@@ -5,6 +5,7 @@
 enum figure {BOX, BALL};
 
 typedef struct {
+    bool isCollision;
     Vector2 cp;
     Vector2 normal;
 } CollisionPoint;
@@ -40,5 +41,9 @@ CollisionPoint detectCollisionBox(Shape* boxA, Shape* boxB);
 CollisionPoint detectCollisionBall(Shape* ballA, Shape* ballB);
 CollisionPoint detectCollisionBallBox(Shape* ball, Shape* box);
 void resolveCollisionBox(Shape* boxA, Shape* boxB, Vector2 cp, Vector2 normal);
+void resolveCollisionBall(Shape* ballA, Shape* ballB, Vector2 normal);
+void resolveCollisionBallBox(Shape* ball, Shape* box, Vector2 cp, Vector2 normal);
+void checkCollision(Shape* shapeA, Shape* shapeB);
+
 
 #endif
