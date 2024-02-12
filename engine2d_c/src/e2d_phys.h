@@ -5,6 +5,13 @@
 enum figure {BOX, BALL};
 
 typedef struct {
+    float minX;
+    float maxX;
+    float minY;
+    float maxY;
+} Shadow;
+
+typedef struct {
     bool isCollision;
     Vector2 cp;
     Vector2 normal;
@@ -30,6 +37,7 @@ typedef struct _shape {
 
 Shape createBox(float x, float y, float w, float h);
 Shape createBall(float x, float y, float r);
+Shadow createShadow(Shape* shape);
 
 void draw(Shape* shape, float thick, Color c);
 void update(Shape* shape);

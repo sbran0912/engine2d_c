@@ -3,10 +3,12 @@
 
 int main() {
     Shape shapes[MAX];
-    shapes[0] = createBox(150, 150, 150, 150);
+    shapes[0] = createBox(150, 150, 250, 100);
     shapes[1] = createBox(160, 400, 150, 150);
     shapes[2] = createBall(700, 150, 40);
     shapes[3] = createBall(800, 400, 40);
+    applyForce(&shapes[0], (Vector2){0, 0}, 5);
+    shapes[0].mass = INFINITY;
 
     // Initialization
     //--------------------------------------------------------------------------------------

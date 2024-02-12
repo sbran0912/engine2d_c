@@ -78,6 +78,40 @@ void _resetPosBall(Shape *ball, Vector2 v) {
     }
 }
 
+Shadow createShadow(Shape* shape) {
+    Shadow shadow;
+    if (shape->typ == BALL) {
+        shadow = (Shadow){
+            .minX = shape->location.x - shape->radius, 
+            .maxX = shape->location.x + shape->radius, 
+            .minY = shape->location.y - shape->radius, 
+            .maxY = shape->location.y + shape->radius
+            };
+    } else {
+        shadow = (Shadow){
+            .minX = INFINITY, 
+            .maxX =-INFINITY, 
+            .minY = INFINITY, 
+            .maxY =-INFINITY
+            };
+        for (int i = 0; i < 4; i++) {
+            if (shape->vertices[i].x < shadow.minX) {
+                shadow.minX = shape->vertices[i].x;
+            } 
+            if (shape->vertices[i].y < shadow.minY) {
+                shadow.minY = shape->vertices[i].y;
+            } 
+            if (shape->vertices[i].x > shadow.maxX) {
+                shadow.maxX = shape->vertices[i].x;
+            } 
+            if (shape->vertices[i].y > shadow.maxY) {
+                shadow.maxY = shape->vertices[i].y;
+            } 
+        }    
+    }
+    
+    return shadow;
+}
 
 Shape createBox(float x, float y, float w, float h) {
     Shape result = {
@@ -367,49 +401,49 @@ void resolveCollisionBallBox(Shape* ball, Shape* box, Vector2 cp, Vector2 normal
 }
 
 void checkCollision(Shape* shapeA, Shape* shapeB) {
-//Shadow berechnen von Element i und Element j 
-//let shadow_i = createShadow(shapes[i]);
-//let shadow_j = createShadow(shapes[j]);
-//Überschneidung prüfen
-//if (shadow_i.maxX >= shadow_j.minX && shadow_i.minX <= shadow_j.maxX && shadow_i.maxY >= shadow_j.minY && shadow_i.minY <= shadow_j.maxY) {  
-    //dann Überschneidung
-    // Testcode
-    //lb2d.line(shapes[i].location.x, shapes[i].location.y, shapes[j].location.x, shapes[j].location.y)
-    // Ende Testcode
+    //Shadow berechnen von Element i und Element j 
+    Shadow shadowA = createShadow(shapeA);
+    Shadow shadowB = createShadow(shapeB);
+    //Überschneidung prüfen
+    if (shadowA.maxX >= shadowB.minX && shadowA.minX <= shadowB.maxX && shadowA.maxY >= shadowB.minY && shadowA.minY <= shadowB.maxY) {  
+        //dann Überschneidung
+        // Testcode
+        DrawLineV(shapeA->location, shapeB->location, GREEN);
+        // Ende Testcodew
 
-    if (shapeA->typ == BALL) {
-        if (shapeB->typ == BALL) {
-            CollisionPoint cp = detectCollisionBall(shapeA, shapeB);
-            if (cp.isCollision) {
-                resolveCollisionBall(shapeA, shapeB, cp.normal);
-            }
-        } else {
-            CollisionPoint cp = detectCollisionBallBox(shapeA, shapeB);
-            if (cp.isCollision) {
-                resolveCollisionBallBox(shapeA, shapeB, cp.cp, cp.normal);
-            }
-        }
-    }
-
-    if (shapeA->typ == BOX) {
-        if (shapeB->typ == BOX) {
-            // beide Boxen müssen geprüft werden, ob sie auf
-            // die jeweils andere trefen könnte
-            CollisionPoint cp = detectCollisionBox(shapeA, shapeB);
-            if (cp.isCollision) {
-                resolveCollisionBox(shapeA, shapeB, cp.cp, cp.normal);  
-            } else {
-                CollisionPoint cp = detectCollisionBox(shapeA, shapeB);    
+        if (shapeA->typ == BALL) {
+            if (shapeB->typ == BALL) {
+                CollisionPoint cp = detectCollisionBall(shapeA, shapeB);
                 if (cp.isCollision) {
-                    resolveCollisionBox(shapeA, shapeB, cp.cp, cp.normal);
+                    resolveCollisionBall(shapeA, shapeB, cp.normal);
+                }
+            } else {
+                CollisionPoint cp = detectCollisionBallBox(shapeA, shapeB);
+                if (cp.isCollision) {
+                    resolveCollisionBallBox(shapeA, shapeB, cp.cp, cp.normal);
                 }
             }
-        } else {
-            CollisionPoint cp = detectCollisionBallBox(shapeB, shapeA);
-            if (cp.isCollision) {
-                resolveCollisionBallBox(shapeB, shapeA, cp.cp, cp.normal);
-            }
-        }            
+        }
+
+        if (shapeA->typ == BOX) {
+            if (shapeB->typ == BOX) {
+                // beide Boxen müssen geprüft werden, ob sie auf
+                // die jeweils andere trefen könnte
+                CollisionPoint cp = detectCollisionBox(shapeA, shapeB);
+                if (cp.isCollision) {
+                    resolveCollisionBox(shapeA, shapeB, cp.cp, cp.normal);  
+                } else {
+                    CollisionPoint cp = detectCollisionBox(shapeA, shapeB);    
+                    if (cp.isCollision) {
+                        resolveCollisionBox(shapeA, shapeB, cp.cp, cp.normal);
+                    }
+                }
+            } else {
+                CollisionPoint cp = detectCollisionBallBox(shapeB, shapeA);
+                if (cp.isCollision) {
+                    resolveCollisionBallBox(shapeB, shapeA, cp.cp, cp.normal);
+                }
+            }            
+        }
     }
-//}
 }
