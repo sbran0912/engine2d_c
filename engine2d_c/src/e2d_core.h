@@ -39,16 +39,16 @@ Vector2 divVec(Vector2 v, float n);
 void vecNormalize(Vector2* v);
 void vecLimit(Vector2* v, float max);
 void vecSetMag(Vector2* v, float magnitude);
-float dot(Vector2 v1, Vector2 v2);
-float cross(Vector2 v1, Vector2 v2);
+float dotVec(Vector2 v1, Vector2 v2);
+float crossVec(Vector2 v1, Vector2 v2);
 Vector2 perpVec(Vector2 v);
-float mag(Vector2 v);
-float magsq(Vector2 v);
-float distance(Vector2 v1, Vector2 v2);
+float magVec(Vector2 v);
+float magsqVec(Vector2 v);
+float distanceVec(Vector2 v1, Vector2 v2);
 Vector2 rotateVec(Vector2 v, Vector2 base, float n);
 
-Intersection intersect(Vector2 start_a, Vector2 end_a, Vector2 start_b, Vector2 end_b);
-float minDist(Vector2 p, Vector2 start_a, Vector2 end_a);
+Intersection intersectVec(Vector2 start_a, Vector2 end_a, Vector2 start_b, Vector2 end_b);
+float minDistVec(Vector2 p, Vector2 start_a, Vector2 end_a);
 
 
 #endif

@@ -137,11 +137,11 @@ void vecSetMag(Vector2* v, float magnitude) {
 	}
 }
 
-float dot(Vector2 v1, Vector2 v2) {
+float dotVec(Vector2 v1, Vector2 v2) {
 	return v1.x * v2.x + v1.y * v2.y;
 }
 
-float cross(Vector2 v1, Vector2 v2) {
+float crossVec(Vector2 v1, Vector2 v2) {
 	return v1.x * v2.y - v1.y * v2.x;
 }
 
@@ -149,17 +149,17 @@ Vector2 perpVec(Vector2 v) {
 	return (Vector2){-v.y, v.x};
 }
 
-float mag(Vector2 v) {
+float magVec(Vector2 v) {
 	return sqrtf(v.x * v.x + v.y * v.y);
 }
 
-float magsq(Vector2 v) {
+float magsqVec(Vector2 v) {
 	return v.x * v.x + v.y * v.y;
 }
 
-float distance(Vector2 v1, Vector2 v2) {
+float distanceVec(Vector2 v1, Vector2 v2) {
 	Vector2 vdist = subVec(v1, v2);
-	return mag(vdist);
+	return magVec(vdist);
 }
 
 Vector2 rotateVec(Vector2 v, Vector2 base, float n) {
@@ -169,14 +169,14 @@ Vector2 rotateVec(Vector2 v, Vector2 base, float n) {
 	return (Vector2){x = x + base.x, y = y + base.y};
 }
 
-Intersection intersect(Vector2 start_a, Vector2 end_a, Vector2 start_b, Vector2 end_b) {
+Intersection intersectVec(Vector2 start_a, Vector2 end_a, Vector2 start_b, Vector2 end_b) {
 	Vector2 a = subVec(end_a, start_a);
 	Vector2 b = subVec(end_b, start_b);
-	float cross1 = cross(a, b);
-	float cross2 = cross(b, a);
+	float cross1 = crossVec(a, b);
+	float cross2 = crossVec(b, a);
 	if (fabs(cross1 - 0.0f) > 0.01) { //Float kann man nicht direkt auf 0 testen!!!
-		float s = cross(subVec(start_b, start_a), b) / cross1;
-		float u = cross(subVec(start_a, start_b), a) / cross2;
+		float s = crossVec(subVec(start_b, start_a), b) / cross1;
+		float u = crossVec(subVec(start_a, start_b), a) / cross2;
 		if (s > 0.0001 && s < 1 && u > 0.0001 && u < 1) {
 			return (Intersection){s, addVec(start_a, scaleVec(a, s))};
 		}
@@ -184,7 +184,7 @@ Intersection intersect(Vector2 start_a, Vector2 end_a, Vector2 start_b, Vector2 
 	return (Intersection){0.0f, (Vector2){0.0f, 0.0f}};
 }
 
-float minDist(Vector2 p, Vector2 start_a, Vector2 end_a) {
+float minDistVec(Vector2 p, Vector2 start_a, Vector2 end_a) {
 	float dist = -1.0f;
 
 	//Vektor start_a to end_a (line_a)
@@ -192,16 +192,16 @@ float minDist(Vector2 p, Vector2 start_a, Vector2 end_a) {
 	//Vektor imaginary line start_a to p
 	Vector2 start_a_to_p = subVec(p, start_a);
 	//Magnitude of line_a
-	float magnitude = mag(line_a);
+	float magnitude = magVec(line_a);
 
 	//Scalarprojecton from line (start_a to p) on line_a
 	vecNormalize(&line_a);
-	float sp = dot(line_a, start_a_to_p);
+	float sp = dotVec(line_a, start_a_to_p);
 
 	//Scalarprojection in magnitude of line_a?
 	if (sp > 0.0001 && sp <= magnitude) {
 		vecScale(&line_a, sp);
-		dist = mag(subVec(start_a_to_p, line_a));
+		dist = magVec(subVec(start_a_to_p, line_a));
 	}
 	return dist;
 }

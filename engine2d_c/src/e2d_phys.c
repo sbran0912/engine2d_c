@@ -177,7 +177,7 @@ Vector2 checkKicking(Shape* shape) {
 
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
 
-        if (distance(shape->location, mousePos) < 10) {
+        if (distanceVec(shape->location, mousePos) < 10) {
             shape->marked = true;
         }
 
@@ -211,10 +211,10 @@ CollisionPoint detectCollisionBox(Shape* boxA, Shape* boxB) {
     for (int i = 0; i < 4; i++) {            
         for (int j = 0; j < 4; j++) {
             // Prüfung auf intersection von Diagonale d zu Kante e
-            Intersection isd = intersect(boxA->location, boxA->vertices[i], boxB->vertices[j], boxB->vertices[j + 1]);   
+            Intersection isd = intersectVec(boxA->location, boxA->vertices[i], boxB->vertices[j], boxB->vertices[j + 1]);   
             if (isd.distance > 0.0f) {
                 // Prüfung auf intersection Linie z zu Kante e
-                Intersection isz = intersect(boxA->location, boxB->location, boxB->vertices[j], boxB->vertices[j + 1]);
+                Intersection isz = intersectVec(boxA->location, boxB->location, boxB->vertices[j], boxB->vertices[j + 1]);
                 if (isz.distance > 0.0f) {
                     // Collision findet statt
                     // Objekte zurücksetzen und normal_e berechnen. Kollisionspunkt ist Ecke i von BoxA
@@ -223,7 +223,7 @@ CollisionPoint detectCollisionBox(Shape* boxA, Shape* boxB) {
                     Vector2 d = subVec(boxA->vertices[i], boxA->location);  
                     vecScale(&d, 1-isd.distance);
                     vecNormalize(&e_perp);
-                    float distance = dot(e_perp, d);
+                    float distance = dotVec(e_perp, d);
                     vecScale(&e_perp, -distance); //mtv
                     resetPos(boxA, scaleVec(e_perp, 0.5f));
                     resetPos(boxB, scaleVec(e_perp, -0.5f));
@@ -238,7 +238,7 @@ CollisionPoint detectCollisionBox(Shape* boxA, Shape* boxB) {
 CollisionPoint detectCollisionBall(Shape* ballA, Shape* ballB) {
     //Distanz ermitteln
     float radiusTotal = ballA->radius + ballB->radius;
-    float dist = distance(ballA->location, ballB->location);
+    float dist = distanceVec(ballA->location, ballB->location);
     if (dist < radiusTotal) {
         //Treffer
         float space = (radiusTotal - dist);
@@ -259,13 +259,13 @@ CollisionPoint detectCollisionBallBox(Shape* ball, Shape* box) {
         //Vektor von Ecke der Box zum Ball
         Vector2 VerticeToBall = subVec(ball->location, box->vertices[i]);
         //Kollision mit Ecken abfangen
-        if (mag(VerticeToBall) < ball->radius) {
+        if (magVec(VerticeToBall) < ball->radius) {
             return (CollisionPoint){true, box->vertices[i], VerticeToBall};
         }
-        float mag_e = mag(e);
+        float mag_e = magVec(e);
         vecNormalize(&e);
         //Scalarprojektion von Vektor VerticeToBall auf Kante e
-        float scalar_e = dot(VerticeToBall, e);
+        float scalar_e = dotVec(VerticeToBall, e);
         if (scalar_e > 0 && scalar_e <= mag_e) {
             //Senkrechte von Ball trifft auf Kante e der Box
             //e2 = Kante e mit der Länge von scalar_e
@@ -273,12 +273,12 @@ CollisionPoint detectCollisionBallBox(Shape* ball, Shape* box) {
             //Senkrechte von e zum Ball = VerticeToBall - e2
             Vector2 e_perp = subVec(VerticeToBall, e2);
 
-            if (mag(e_perp) < ball->radius) {
+            if (magVec(e_perp) < ball->radius) {
                 //Ball berührt Box
                 //Abstand wieder herstellen mit mtv (minimal translation vector)
                 Vector2 mtv = e_perp;
                 Vector2 p = addVec(box->vertices[i], e2);
-                vecSetMag(&mtv, ball->radius - mag(e_perp));
+                vecSetMag(&mtv, ball->radius - magVec(e_perp));
                 //e_perp und damit mtv zeigt von Kante zu Ball
                 resetPos(ball, mtv);
                 //vor Berechnung muss e_perp normalisiert werden
@@ -303,26 +303,26 @@ void resolveCollisionBox(Shape* boxA, Shape* boxB, Vector2 cp, Vector2 normal) {
     Vector2 VgesamtA = addVec(boxA->velocity, VtanA);
     Vector2 VgesamtB = addVec(boxB->velocity, VtanB);
     Vector2 velocity_AB = subVec(VgesamtA, VgesamtB);
-    if (dot(velocity_AB, normal) < 0) { // wenn negativ, dann auf Kollisionskurs
+    if (dotVec(velocity_AB, normal) < 0) { // wenn negativ, dann auf Kollisionskurs
         float e = 1.0f; //inelastischer Stoß
-        float j_denominator = dot(scaleVec(velocity_AB, -(1+e)), normal);
-        float j_divLinear = dot(normal, scaleVec(normal, (1/boxA->mass + 1/boxB->mass)));
-        float j_divAngular = (float)pow(dot(rAP_perp, normal), 2) / boxA->inertia + (float)pow(dot(rBP_perp, normal), 2) / boxB->inertia;
+        float j_denominator = dotVec(scaleVec(velocity_AB, -(1+e)), normal);
+        float j_divLinear = dotVec(normal, scaleVec(normal, (1/boxA->mass + 1/boxB->mass)));
+        float j_divAngular = (float)pow(dotVec(rAP_perp, normal), 2) / boxA->inertia + (float)pow(dotVec(rBP_perp, normal), 2) / boxB->inertia;
         float j = j_denominator / (j_divLinear + j_divAngular);
         // Grundlage für Friction berechnen (t)
         Vector2 t = {-(normal.y), normal.x};
-        float t_scalarprodukt = dot(velocity_AB, t);
+        float t_scalarprodukt = dotVec(velocity_AB, t);
         vecScale(&t, (t_scalarprodukt));
         vecNormalize(&t);
 
         //apply Force        
         Vector2 force = addVec(scaleVec(normal, (j/boxA->mass)), scaleVec(t, (0.2*-j/boxA->mass)));
-        float force_ang = dot(rAP_perp, addVec(scaleVec(normal, j/boxA->inertia), scaleVec(t, 0.2*-j/boxA->inertia)));
+        float force_ang = dotVec(rAP_perp, addVec(scaleVec(normal, j/boxA->inertia), scaleVec(t, 0.2*-j/boxA->inertia)));
         boxA->accel = addVec(boxA->accel, force);
         boxA->angAccel += force_ang;
 
         force = addVec(scaleVec(normal, (-j/boxB->mass)), scaleVec(t, (0.2*j/boxB->mass)));
-        force_ang = dot(rAP_perp, addVec(scaleVec(normal, -j/boxB->inertia), scaleVec(t, 0.2*j/boxB->inertia)));
+        force_ang = dotVec(rAP_perp, addVec(scaleVec(normal, -j/boxB->inertia), scaleVec(t, 0.2*j/boxB->inertia)));
         boxB->accel = addVec(boxB->accel, force);
         boxB->angAccel += force_ang;
 
@@ -340,25 +340,25 @@ void resolveCollisionBall(Shape* ballA, Shape* ballB, Vector2 normal) {
     Vector2 VgesamtB = addVec(ballB->velocity, VtanB);
     Vector2 velocity_AB = subVec(VgesamtA, VgesamtB);   
     
-    if (dot(velocity_AB, normal) < 0) { // wenn negativ, dann auf Kollisionskurs
+    if (dotVec(velocity_AB, normal) < 0) { // wenn negativ, dann auf Kollisionskurs
         float e = 1; //inelastischer Stoß
-        float j_denominator = dot(scaleVec(velocity_AB, -(1+e)), normal);
-        float j_divLinear = dot(normal, scaleVec(normal, (1/ballA->mass + 1/ballB->mass)));
+        float j_denominator = dotVec(scaleVec(velocity_AB, -(1+e)), normal);
+        float j_divLinear = dotVec(normal, scaleVec(normal, (1/ballA->mass + 1/ballB->mass)));
         float j = j_denominator / j_divLinear;
         // Grundlage für Friction berechnen
         Vector2 t = {-normal.y, normal.x};
-        float t_scalarprodukt = dot(velocity_AB, t);
+        float t_scalarprodukt = dotVec(velocity_AB, t);
         vecScale(&t, t_scalarprodukt);
         vecNormalize(&t);
 
         //apply Force
         Vector2 force = addVec(scaleVec(normal, (0.8*j/ballA->mass)), scaleVec(t, (0.2*-j/ballA->mass)));
-        float force_ang = dot(rA_perp, scaleVec(t, 0.1*-j/ballA->inertia));
+        float force_ang = dotVec(rA_perp, scaleVec(t, 0.1*-j/ballA->inertia));
         ballA->accel = addVec(ballA->accel, force);
         ballA->angAccel += force_ang;
 
         force = addVec(scaleVec(normal, (0.8*-j/ballB->mass)), scaleVec(t, (0.2*j/ballB->mass)));
-        force_ang = dot(rB_perp, scaleVec(t, 0.1*j/ballB->inertia));
+        force_ang = dotVec(rB_perp, scaleVec(t, 0.1*j/ballB->inertia));
         ballB->accel = addVec(ballB->accel, force);
         ballB->angAccel += force_ang;
     }
@@ -375,26 +375,26 @@ void resolveCollisionBallBox(Shape* ball, Shape* box, Vector2 cp, Vector2 normal
     Vector2 VgesamtB = addVec(box->velocity, VtanB);
     Vector2 velocity_AB = subVec(VgesamtA, VgesamtB);
 
-    if (dot(velocity_AB, normal) < 0) { // wenn negativ, dann auf Kollisionskurs
+    if (dotVec(velocity_AB, normal) < 0) { // wenn negativ, dann auf Kollisionskurs
 
         float e = 1; //inelastischer Stoß
-        float j_denominator = dot(scaleVec(velocity_AB, -(1+e)), normal);
-        float j_divLinear = dot(normal, scaleVec(normal, (1/ball->mass + 1/box->mass)));
-        float j_divAngular = (float)pow(dot(rBP_perp, normal), 2) / box->inertia; //nur für Box zu rechnen
+        float j_denominator = dotVec(scaleVec(velocity_AB, -(1+e)), normal);
+        float j_divLinear = dotVec(normal, scaleVec(normal, (1/ball->mass + 1/box->mass)));
+        float j_divAngular = (float)pow(dotVec(rBP_perp, normal), 2) / box->inertia; //nur für Box zu rechnen
         float j = j_denominator / (j_divLinear + j_divAngular);
         // Grundlage für Friction berechnen
         Vector2 t = {-normal.y, normal.x};
-        float t_scalarprodukt = dot(velocity_AB, t);
+        float t_scalarprodukt = dotVec(velocity_AB, t);
         vecScale(&t, t_scalarprodukt);
         vecNormalize(&t);
         // Apply Force
         Vector2 force = addVec(scaleVec(normal, (0.8*j/ball->mass)), scaleVec(t, (0.05*-j/ball->mass)));
-        float force_ang = dot(rA_perp, scaleVec(t, 0.05*-j/ball->inertia));
+        float force_ang = dotVec(rA_perp, scaleVec(t, 0.05*-j/ball->inertia));
         ball->accel = addVec(ball->accel, force);
         ball->angAccel += force_ang;
            
         force = addVec(scaleVec(normal, (-j/box->mass)), scaleVec(t, (0.05*j/box->mass)));
-        force_ang = dot(rBP_perp, addVec(scaleVec(normal, -j/box->inertia), scaleVec(t, 0.05*j/box->inertia)));
+        force_ang = dotVec(rBP_perp, addVec(scaleVec(normal, -j/box->inertia), scaleVec(t, 0.05*j/box->inertia)));
         box->accel = addVec(box->accel, force);
         box->angAccel += force_ang;
     }
