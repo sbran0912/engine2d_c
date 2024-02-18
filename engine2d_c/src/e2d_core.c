@@ -1,6 +1,6 @@
 #include "e2d_core.h"
 
-int random(int range_start, int range_end) {
+int e2_random(int range_start, int range_end) {
     struct timespec tp;
     clockid_t clk_id;
     clk_id = CLOCK_MONOTONIC;
@@ -9,7 +9,7 @@ int random(int range_start, int range_end) {
     return (rand() % (range_end - range_start + 1)) + range_start;
 }
 
-float limitNum(float number, float limit) {
+float e2_limitNum(float number, float limit) {
 	int vorzeichen = (number < 0) ? -1 : 1;
 	float numberMag = number * vorzeichen;
 	if (numberMag > limit) numberMag = limit;
@@ -17,21 +17,21 @@ float limitNum(float number, float limit) {
 	return numberMag * vorzeichen;
 }
 
-void drawArrow(Vector2 v_base, Vector2 v_target, Color c) {
+void e2_drawArrow(Vector2 v_base, Vector2 v_target, Color c) {
 	DrawLineEx(v_base, v_target, 4, c);
 }
 
-Matrix3x1 transVecToMatrix(Vector2 point) {
+Matrix3x1 e2_transVecToMatrix(Vector2 point) {
 
 	return (Matrix3x1){{point.x, point.y, 1}};
 }
 
-Vector2 transMatrixToVec(Matrix3x1 matrix) {
+Vector2 e2_transMatrixToVec(Matrix3x1 matrix) {
 
 	return (Vector2){matrix.index[0], matrix.index[1]};
 }
 
-Matrix3x1 multMatrix(Matrix3x3 a, Matrix3x1 b) {
+Matrix3x1 e2_multMatrix(Matrix3x3 a, Matrix3x1 b) {
 	Matrix3x1 result = {{0, 0, 0}};
 	for (int i = 0; i < 3; i++)
 	{
@@ -43,10 +43,10 @@ Matrix3x1 multMatrix(Matrix3x3 a, Matrix3x1 b) {
 	return result;
 }
 
-Matrix3x1 rotateMatrix(Vector2 point, Vector2 center, float angel) {
+Matrix3x1 e2_rotateMatrix(Vector2 point, Vector2 center, float angel) {
 
-	Matrix3x1 matrix_point = transVecToMatrix(point);
-	Matrix3x1 matrix_center = transVecToMatrix(center);
+	Matrix3x1 matrix_point = e2_transVecToMatrix(point);
+	Matrix3x1 matrix_center = e2_transVecToMatrix(center);
 
 	Matrix3x3 m_rotate = { {
 		{cosf(angel), -sinf(angel), 0},
@@ -66,54 +66,54 @@ Matrix3x1 rotateMatrix(Vector2 point, Vector2 center, float angel) {
 		{0, 0, 1}
 	} };
 
-	Matrix3x1 matrix_p_transformed = multMatrix(m_transform_center, matrix_point);
-	Matrix3x1 matrix_p_transformed_rotated = multMatrix(m_rotate, matrix_p_transformed);
+	Matrix3x1 matrix_p_transformed = e2_multMatrix(m_transform_center, matrix_point);
+	Matrix3x1 matrix_p_transformed_rotated = e2_multMatrix(m_rotate, matrix_p_transformed);
 
-	return multMatrix(m_transform_center_back, matrix_p_transformed_rotated);
+	return e2_multMatrix(m_transform_center_back, matrix_p_transformed_rotated);
 }
 
 
 
-Vector2 createVec(float x, float y) {
+Vector2 e2_Vector(float x, float y) {
     return (Vector2){x, y};
 }
 
-void vecSet(Vector2* v, float x, float y) {
+void e2_vecSet(Vector2* v, float x, float y) {
 	v->x = x;
 	v->y = y;
 }
 
-void vecScale(Vector2* v, float n) {
+void e2_vecScale(Vector2* v, float n) {
 	v->x = v->x * n;
 	v->y = v->y * n;
 }
 
-Vector2 scaleVec(Vector2 v, float n) {
+Vector2 e2_VecScale(Vector2 v, float n) {
 	return (Vector2) {v.x * n, v.y * n};
 }
 
-void vecDiv(Vector2* v, float n) {
+void e2_vecDiv(Vector2* v, float n) {
 	v->x = v->x/n;
 	v->y = v->y/n;	
 }
 
-Vector2 addVec(Vector2 v1, Vector2 v2) {
+Vector2 e2_VecAdd(Vector2 v1, Vector2 v2) {
 	Vector2 result = {v1.x + v2.x, v1.y + v2.y};
 	return result;
 }
 
-Vector2 subVec(Vector2 v1, Vector2 v2) {
+Vector2 e2_VecSub(Vector2 v1, Vector2 v2) {
 	Vector2 result = {v1.x - v2.x, v1.y - v2.y};
 	return result;
 }
 
-Vector2 divVec(Vector2 v, float n) {
+Vector2 e2_VecDiv(Vector2 v, float n) {
 	Vector2 result = {v.x/n, v.y/n};
 	return result;
 
 }
 
-void vecNormalize(Vector2* v) {
+void e2_vecNorm(Vector2* v) {
 	float len = sqrtf(v->x * v->x + v->y * v->y);
 	if (len > 0.0001) {
 		v->x = v->x / len;
@@ -121,7 +121,7 @@ void vecNormalize(Vector2* v) {
 	}
 }
 
-void vecLimit(Vector2* v, float max) {
+void e2_vecLimit(Vector2* v, float max) {
 	float len = sqrtf(v->x * v->x + v->y * v->y);
 	if (len > max) {
 		v->x = v->x / len * max;
@@ -129,7 +129,7 @@ void vecLimit(Vector2* v, float max) {
 	}
 }
 
-void vecSetMag(Vector2* v, float magnitude) {
+void e2_vecSetMag(Vector2* v, float magnitude) {
 	float len = sqrtf(v->x * v->x + v->y * v->y);
 	if (len > 0) {
 		v->x = v->x / len * magnitude;
@@ -137,71 +137,71 @@ void vecSetMag(Vector2* v, float magnitude) {
 	}
 }
 
-float dotVec(Vector2 v1, Vector2 v2) {
+float e2_dot(Vector2 v1, Vector2 v2) {
 	return v1.x * v2.x + v1.y * v2.y;
 }
 
-float crossVec(Vector2 v1, Vector2 v2) {
+float e2_cross(Vector2 v1, Vector2 v2) {
 	return v1.x * v2.y - v1.y * v2.x;
 }
 
-Vector2 perpVec(Vector2 v) {
+Vector2 e2_VecPerp(Vector2 v) {
 	return (Vector2){-v.y, v.x};
 }
 
-float magVec(Vector2 v) {
+float e2_mag(Vector2 v) {
 	return sqrtf(v.x * v.x + v.y * v.y);
 }
 
-float magsqVec(Vector2 v) {
+float e2_magsq(Vector2 v) {
 	return v.x * v.x + v.y * v.y;
 }
 
-float distanceVec(Vector2 v1, Vector2 v2) {
-	Vector2 vdist = subVec(v1, v2);
-	return magVec(vdist);
+float e2_dist(Vector2 v1, Vector2 v2) {
+	Vector2 vdist = e2_VecSub(v1, v2);
+	return e2_mag(vdist);
 }
 
-Vector2 rotateVec(Vector2 v, Vector2 base, float n) {
-	Vector2 direction = subVec(v, base);
+Vector2 e2_VecRotate(Vector2 v, Vector2 base, float n) {
+	Vector2 direction = e2_VecSub(v, base);
 	float x = direction.x * cosf(n) - direction.y * sinf(n);
 	float y = direction.x * sinf(n) + direction.y * cosf(n);
 	return (Vector2){x = x + base.x, y = y + base.y};
 }
 
-Intersection intersectVec(Vector2 start_a, Vector2 end_a, Vector2 start_b, Vector2 end_b) {
-	Vector2 a = subVec(end_a, start_a);
-	Vector2 b = subVec(end_b, start_b);
-	float cross1 = crossVec(a, b);
-	float cross2 = crossVec(b, a);
+Intersection e2_intersect(Vector2 start_a, Vector2 end_a, Vector2 start_b, Vector2 end_b) {
+	Vector2 a = e2_VecSub(end_a, start_a);
+	Vector2 b = e2_VecSub(end_b, start_b);
+	float cross1 = e2_cross(a, b);
+	float cross2 = e2_cross(b, a);
 	if (fabs(cross1 - 0.0f) > 0.01) { //Float kann man nicht direkt auf 0 testen!!!
-		float s = crossVec(subVec(start_b, start_a), b) / cross1;
-		float u = crossVec(subVec(start_a, start_b), a) / cross2;
+		float s = e2_cross(e2_VecSub(start_b, start_a), b) / cross1;
+		float u = e2_cross(e2_VecSub(start_a, start_b), a) / cross2;
 		if (s > 0.0001 && s < 1 && u > 0.0001 && u < 1) {
-			return (Intersection){s, addVec(start_a, scaleVec(a, s))};
+			return (Intersection){s, e2_VecAdd(start_a, e2_VecScale(a, s))};
 		}
 	}
 	return (Intersection){0.0f, (Vector2){0.0f, 0.0f}};
 }
 
-float minDistVec(Vector2 p, Vector2 start_a, Vector2 end_a) {
+float e2_minDist(Vector2 p, Vector2 start_a, Vector2 end_a) {
 	float dist = -1.0f;
 
 	//Vektor start_a to end_a (line_a)
-	Vector2 line_a = subVec(end_a, start_a);
+	Vector2 line_a = e2_VecSub(end_a, start_a);
 	//Vektor imaginary line start_a to p
-	Vector2 start_a_to_p = subVec(p, start_a);
+	Vector2 start_a_to_p = e2_VecSub(p, start_a);
 	//Magnitude of line_a
-	float magnitude = magVec(line_a);
+	float magnitude = e2_mag(line_a);
 
 	//Scalarprojecton from line (start_a to p) on line_a
-	vecNormalize(&line_a);
-	float sp = dotVec(line_a, start_a_to_p);
+	e2_vecNorm(&line_a);
+	float sp = e2_dot(line_a, start_a_to_p);
 
 	//Scalarprojection in magnitude of line_a?
 	if (sp > 0.0001 && sp <= magnitude) {
-		vecScale(&line_a, sp);
-		dist = magVec(subVec(start_a_to_p, line_a));
+		e2_vecScale(&line_a, sp);
+		dist = e2_mag(e2_VecSub(start_a_to_p, line_a));
 	}
 	return dist;
 }

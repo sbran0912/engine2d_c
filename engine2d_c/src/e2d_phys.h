@@ -35,23 +35,23 @@ typedef struct _shape {
     void (*funcResetPos)(struct _shape*, Vector2);
 } Shape;
 
-Shape createBox(float x, float y, float w, float h);
-Shape createBall(float x, float y, float r);
-Shadow createShadow(Shape* shape);
+Shape e2_Box(float x, float y, float w, float h);
+Shape e2_Ball(float x, float y, float r);
+Shadow e2_Shadow(Shape* shape);
 
-void draw(Shape* shape, float thick, Color c);
-void update(Shape* shape);
-void applyForce(Shape* shape, Vector2 force, float angForce);
-void resetPos(Shape* shape, Vector2 v);
-Vector2 checkKicking(Shape* shape);
+void e2_shapeDraw(Shape* shape, float thick, Color c);
+void e2_shapeUpdate(Shape* shape);
+void e2_applyForce(Shape* shape, Vector2 force, float angForce);
+void e2_shapeResetPos(Shape* shape, Vector2 v);
+Vector2 e2_checkKicking(Shape* shape);
 
-CollisionPoint detectCollisionBox(Shape* boxA, Shape* boxB);
-CollisionPoint detectCollisionBall(Shape* ballA, Shape* ballB);
-CollisionPoint detectCollisionBallBox(Shape* ball, Shape* box);
-void resolveCollisionBox(Shape* boxA, Shape* boxB, Vector2 cp, Vector2 normal);
-void resolveCollisionBall(Shape* ballA, Shape* ballB, Vector2 normal);
-void resolveCollisionBallBox(Shape* ball, Shape* box, Vector2 cp, Vector2 normal);
-void checkCollision(Shape* shapeA, Shape* shapeB);
+CollisionPoint e2_detectCollBox(Shape* boxA, Shape* boxB);
+CollisionPoint e2_detectCollBall(Shape* ballA, Shape* ballB);
+CollisionPoint e2_detectCollBallBox(Shape* ball, Shape* box);
+void e2_resolveCollBox(Shape* boxA, Shape* boxB, Vector2 cp, Vector2 normal);
+void e2_resolveCollBall(Shape* ballA, Shape* ballB, Vector2 normal);
+void e2_resolveCollBallBox(Shape* ball, Shape* box, Vector2 cp, Vector2 normal);
+void e2_checkColl(Shape* shapeA, Shape* shapeB);
 
 
 #endif
