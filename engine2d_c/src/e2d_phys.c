@@ -171,7 +171,7 @@ void e2_shapeResetPos(Shape *shape, Vector2 v) {
     shape->funcResetPos(shape, v);
 }
 
-Vector2 e2_checkKicking(Shape* shape) {
+Vector2 e2_checkKick(Shape* shape) {
 
     Vector2 mousePos = { (float)GetMouseX(), (float)GetMouseY() };
 

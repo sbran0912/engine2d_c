@@ -26,7 +26,7 @@ int main() {
             for (size_t j = i + 1; j < MAX; j++) {
                 e2_checkColl(&shapes[i], &shapes[j]);
             }
-            Vector2 force = e2_checkKicking(&shapes[i]);
+            Vector2 force = e2_checkKick(&shapes[i]);
             e2_applyForce(&shapes[i], force, 0);
             e2_shapeUpdate(&shapes[i]);
             e2_shapeDraw(&shapes[i], 3, RED);
