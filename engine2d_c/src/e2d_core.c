@@ -21,6 +21,14 @@ void e2_drawArrow(Vector2 v_base, Vector2 v_target, Color c) {
 	DrawLineEx(v_base, v_target, 4, c);
 }
 
+float constrain(float value, float min, float max) {
+  return fminf(max, fmaxf(min, value));
+}
+
+float map(float n, float range_old, float range_new) {
+  return (n / range_old * range_new);
+}
+
 Matrix3x1 e2_transVecToMatrix(Vector2 point) {
 
 	return (Matrix3x1){{point.x, point.y, 1}};

@@ -42,6 +42,7 @@ Shadow e2_Shadow(Shape* shape);
 void e2_shapeDraw(Shape* shape, float thick, Color c);
 void e2_shapeUpdate(Shape* shape);
 void e2_applyForce(Shape* shape, Vector2 force, float angForce);
+void e2_applyFriction(Shape* shape);
 void e2_shapeResetPos(Shape* shape, Vector2 v);
 Vector2 e2_checkKick(Shape* shape);
 

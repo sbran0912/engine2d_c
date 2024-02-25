@@ -22,6 +22,9 @@ typedef struct {
 int e2_random(int range_start, int range_end);
 float e2_limitNum(float number, float limit);
 void e2_drawArrow(Vector2 v_base, Vector2 v_target, Color c);
+float constrain(float value, float min, float max); // limits value between min and max
+float map(float n, float range_old, float range_new); // scales value n to a new range
+
 
 Matrix3x1 e2_transVecToMatrix(Vector2 point);
 Vector2 e2_transMatrixToVec(Matrix3x1 matrix);

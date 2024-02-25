@@ -3,12 +3,16 @@
 
 int main() {
     Shape shapes[MAX];
-    shapes[0] = e2_Box(150, 150, 250, 100);
+    shapes[0] = e2_Box(100, 700, 1000, 50);
     shapes[1] = e2_Box(160, 400, 150, 150);
     shapes[2] = e2_Ball(700, 150, 40);
     shapes[3] = e2_Ball(800, 400, 40);
-    e2_applyForce(&shapes[0], (Vector2){0, 0}, 5);
+    //e2_applyForce(&shapes[0], (Vector2){0, 0}, 20);
+
     shapes[0].mass = INFINITY;
+    shapes[0].inertia = INFINITY;
+    shapes[1].mass = INFINITY;
+    shapes[1].inertia = INFINITY;
 
     // Initialization
     //--------------------------------------------------------------------------------------
@@ -21,13 +25,15 @@ int main() {
     // Main game loop
     while (!WindowShouldClose()) {
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        ClearBackground(DARKBLUE);
         for (size_t i = 0; i < MAX; i++) {
             for (size_t j = i + 1; j < MAX; j++) {
                 e2_checkColl(&shapes[i], &shapes[j]);
             }
-            Vector2 force = e2_checkKick(&shapes[i]);
-            e2_applyForce(&shapes[i], force, 0);
+            //Vector2 force = e2_checkKick(&shapes[i]);
+            Vector2 kick = e2_checkKick(&shapes[i]);
+            e2_applyForce(&shapes[i], kick, 0);
+            e2_applyFriction(&shapes[i]);
             e2_shapeUpdate(&shapes[i]);
             e2_shapeDraw(&shapes[i], 3, RED);
         }
