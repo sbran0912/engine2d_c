@@ -39,6 +39,8 @@ Shape e2_Box(float x, float y, float w, float h);
 Shape e2_Ball(float x, float y, float r);
 Shadow e2_Shadow(Shape* shape);
 
+void _rotateBox(Shape *box, float angle);
+
 void e2_shapeDraw(Shape* shape, float thick, Color c);
 void e2_shapeUpdate(Shape* shape);
 void e2_applyForce(Shape* shape, Vector2 force, float angForce);

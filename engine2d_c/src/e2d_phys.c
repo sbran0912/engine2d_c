@@ -49,7 +49,7 @@ void _resetPosBox(Shape *box, Vector2 v) {
 void _drawBall(Shape *ball, float thick, Color c) {
     DrawRing(ball->location, ball->radius - 3, ball->radius, 0, 360, 1, c);
     // DrawCircleV(location.pos,radius, c);
-    DrawLineEx(ball->location, ball->orientation, thick, c);
+    //DrawLineEx(ball->location, ball->orientation, thick, c);
 }
 
 void _rotateBall(Shape* ball, float angle) {
@@ -131,7 +131,8 @@ Shape e2_Box(float x, float y, float w, float h) {
         .vertices[4] = {x, y},
         .funcDraw = &_drawBox,
         .funcUpdate = &_updateBox,
-        .funcResetPos = &_resetPosBox};
+        .funcResetPos = &_resetPosBox
+        };
     return result;
 }
 
@@ -150,7 +151,8 @@ Shape e2_Ball(float x, float y, float r) {
         .orientation = {r + x, y},
         .funcDraw = &_drawBall,
         .funcUpdate = &_updateBall,
-        .funcResetPos = &_resetPosBall};
+        .funcResetPos = &_resetPosBall
+        };
     return result;
 }
 
@@ -168,15 +170,14 @@ void e2_applyForce(Shape *shape, Vector2 force, float angForce) {
 }
 
 void e2_applyFriction(Shape* shape) {
-    float coefficient = 0.8f;
+    float coefficient = 0.5f;
     Vector2 frictForce = shape->velocity;
     e2_vecNorm(&frictForce);
     e2_vecScale(&frictForce, coefficient * -1); // in Gegenrichtung
     e2_vecLimit(&frictForce, e2_mag(shape->velocity));
 
     float frictAngDirection = shape->angVelocity < 0 ? 1 : -1; // in Gegenrichtung
-    float frictAngForce = e2_limitNum(coefficient, fabs(shape->angVelocity));
-    frictAngForce = frictAngForce * frictAngDirection;
+    float frictAngForce = e2_limitNum(coefficient * 0.05 * frictAngDirection, abs(shape->angVelocity));
 
     e2_applyForce(shape, frictForce, frictAngForce);
 }

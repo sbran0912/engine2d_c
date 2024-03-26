@@ -21,11 +21,11 @@ void e2_drawArrow(Vector2 v_base, Vector2 v_target, Color c) {
 	DrawLineEx(v_base, v_target, 4, c);
 }
 
-float constrain(float value, float min, float max) {
+float e2_constrain(float value, float min, float max) {
   return fminf(max, fmaxf(min, value));
 }
 
-float map(float n, float range_old, float range_new) {
+float e2_map(float n, float range_old, float range_new) {
   return (n / range_old * range_new);
 }
 
@@ -110,9 +110,19 @@ Vector2 e2_VecAdd(Vector2 v1, Vector2 v2) {
 	return result;
 }
 
+void e2_vecAdd(Vector2* v, Vector2 v_add) {
+	v->x = v->x + v_add.x;
+	v->y = v->y + v_add.y;
+}
+
 Vector2 e2_VecSub(Vector2 v1, Vector2 v2) {
 	Vector2 result = {v1.x - v2.x, v1.y - v2.y};
 	return result;
+}
+
+void e2_vecSub(Vector2* v, Vector2 v_sub) {
+	v->x = v->x - v_sub.x;
+	v->y = v->y - v_sub.y;
 }
 
 Vector2 e2_VecDiv(Vector2 v, float n) {
@@ -175,6 +185,19 @@ Vector2 e2_VecRotate(Vector2 v, Vector2 base, float n) {
 	float x = direction.x * cosf(n) - direction.y * sinf(n);
 	float y = direction.x * sinf(n) + direction.y * cosf(n);
 	return (Vector2){x = x + base.x, y = y + base.y};
+}
+
+float e2_heading(Vector2 v) {
+	return atan2f(v.y, v.x);
+}
+
+float e2_AngleBetween(Vector2 v1, Vector2 v2) {
+    float result = 0.0f;
+    float dot = v1.x*v2.x + v1.y*v2.y;
+    float det = v1.x*v2.y - v1.y*v2.x;
+    result = atan2f(det, dot);
+
+    return result;
 }
 
 Intersection e2_intersect(Vector2 start_a, Vector2 end_a, Vector2 start_b, Vector2 end_b) {

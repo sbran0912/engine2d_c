@@ -22,8 +22,8 @@ typedef struct {
 int e2_random(int range_start, int range_end);
 float e2_limitNum(float number, float limit);
 void e2_drawArrow(Vector2 v_base, Vector2 v_target, Color c);
-float constrain(float value, float min, float max); // limits value between min and max
-float map(float n, float range_old, float range_new); // scales value n to a new range
+float e2_constrain(float value, float min, float max); // limits value between min and max
+float e2_map(float n, float range_old, float range_new); // scales value n to a new range
 
 
 Matrix3x1 e2_transVecToMatrix(Vector2 point);
@@ -37,7 +37,9 @@ void e2_vecScale(Vector2* v, float n);
 Vector2 e2_VecScale(Vector2 v, float n);
 void e2_vecDiv(Vector2* v, float n);
 Vector2 e2_VecAdd(Vector2 v, Vector2 v_add);
+void e2_vecAdd(Vector2* v, Vector2 v_add);
 Vector2 e2_VecSub(Vector2 v, Vector2 v_sub);
+void e2_vecSub(Vector2* v, Vector2 v_sub);
 Vector2 e2_VecDiv(Vector2 v, float n);
 void e2_vecNorm(Vector2* v);
 void e2_vecLimit(Vector2* v, float max);
@@ -49,6 +51,8 @@ float e2_mag(Vector2 v);
 float e2_magsq(Vector2 v);
 float e2_dist(Vector2 v1, Vector2 v2);
 Vector2 e2_VecRotate(Vector2 v, Vector2 base, float n);
+float e2_heading(Vector2 v);
+float e2_AngleBetween(Vector2 v1, Vector2 v2);
 
 Intersection e2_intersect(Vector2 start_a, Vector2 end_a, Vector2 start_b, Vector2 end_b);
 float e2_minDist(Vector2 p, Vector2 start_a, Vector2 end_a);
